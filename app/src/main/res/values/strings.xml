@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">CondoMine</string>
+    <string name="btn_cadastrar" translatable="false">Cadastrar</string>
+    <string name="btn_loginGoogle" translatable="false">Entrar com Google</string>
+    <string name="btn_loginFacebook" translatable="false">Entrar com Facebook</string>
+    <string name="btn_cancelar" translatable="false">Cancelar</string>
+    <string name="btn_confirmar" translatable="false">OK</string>
+    <string name="btn_imagem" translatable="false">Carregue sua Foto</string>
+    <string name="title_activity_mural">Mural do Condomínio</string>
+    <string name="sign_out">Sair</string>
+    <string name="send_button_label">Enviar</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="facebook_app_id">293899144475097</string>
+    <string name="fb_login_protocol_scheme">fb293899144475097</string>
+    <string name="login_cancelado">Login Cancelado</string>
+
+
+    <string name="action_settings">Sair</string>
+    <string name="title_activity_maps">Map</string>
+</resources>
