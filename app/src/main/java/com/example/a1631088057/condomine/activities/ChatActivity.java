@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.a1631088057.condomine.Condomine_Singleton;
 import com.example.a1631088057.condomine.FriendlyMessage;
 import com.example.a1631088057.condomine.MessageAdapter;
 import com.example.a1631088057.condomine.R;
@@ -80,8 +81,14 @@ public class ChatActivity extends AppCompatActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
-        mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("mensagens");
-        mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
+        if (mFirebaseAuth.getCurrentUser().getUid().equals("nd7hnJQDxgfMFBtZ88Czm2sxVj62")) {
+            mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("mural");
+            mChatPhotosStorageReference = mFirebaseStorage.getReference().child("mural_photos");
+        } else {
+            mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("mensagens");
+            mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
+        }
+
 
 
         // Initialize references to views
@@ -147,7 +154,11 @@ public class ChatActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null){
                     // usuario logado
-                    onSignedInInitialize(user.getDisplayName());
+                    if (Condomine_Singleton.getInstance().getTipoLogin().equals("Firebase")){
+                        onSignedInInitialize(Condomine_Singleton.getInstance().getNome().toString());
+                    } else {
+                        onSignedInInitialize(user.getDisplayName());
+                    }
                 } else {
                     // usuario deslogado
                     onSignedOutCleanup();

@@ -84,6 +84,9 @@ public class Atualiza_Activity extends Activity {
 
         txtEmail.setText(mAuth.getCurrentUser().getEmail().toString());
         userID = mAuth.getCurrentUser().getUid().toString();
+        if (!Condomine_Singleton.getInstance().getFoto().isEmpty()){
+            Glide.with(Atualiza_Activity.this).load(Condomine_Singleton.getInstance().getFoto().toString()).into(fotoUser);
+        }
         usuarioRef = usersRef.child(userID);
 
         usuarioRef.addListenerForSingleValueEvent(new ValueEventListener() {

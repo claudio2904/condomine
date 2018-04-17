@@ -38,7 +38,11 @@ import com.example.a1631088057.condomine.ConfiguracaoFirebase;
 import com.example.a1631088057.condomine.Usuarios;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,7 +60,7 @@ public class Condomine_Activity extends AppCompatActivity implements GoogleApiCl
     private int backButtonCount=0;
     LoginButton btnLoginFacebook;
     String estadoLogin="N";
-    private DatabaseReference mDatabase;
+    private DatabaseReference mDatabase, usersRef, usuarioRef;
 
     public static final int SIGN_IN_CODE = 777;
 
@@ -160,6 +164,23 @@ public class Condomine_Activity extends AppCompatActivity implements GoogleApiCl
                 if (task.isSuccessful()){
                     Condomine_Singleton.getInstance().setTipoLogin("Firebase");
                     Condomine_Singleton.getInstance().setEmail(usuarios.getLogin());
+                    String userID = autenticacao.getCurrentUser().getUid().toString();
+                    mDatabase = FirebaseDatabase.getInstance().getReference();
+                    usersRef = mDatabase.child("users");
+                    usuarioRef = usersRef.child(userID);
+
+                    usuarioRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Usuarios usuario = dataSnapshot.getValue(Usuarios.class);
+                            Condomine_Singleton.getInstance().setNome(usuario.getNomeUsuario());
+                            Condomine_Singleton.getInstance().setFoto(usuario.getFotoURL());
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Toast.makeText(Condomine_Activity.this, "Erro ao recuperar dados.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     abrirTelaPrincipal();
                     Toast.makeText(Condomine_Activity.this, "Login efetuado com sucesso.", Toast.LENGTH_SHORT).show();
                 } else {

@@ -1,15 +1,10 @@
 package com.example.a1631088057.condomine.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.text.Editable;
-import android.text.InputFilter;
-import android.text.TextWatcher;
-import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,9 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -33,8 +25,8 @@ import com.example.a1631088057.condomine.Condomine_Singleton;
 import com.example.a1631088057.condomine.FriendlyMessage;
 import com.example.a1631088057.condomine.MessageAdapter;
 import com.example.a1631088057.condomine.R;
+import com.example.a1631088057.condomine.Usuarios;
 import com.facebook.login.LoginManager;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -51,11 +43,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class Mural_Activity extends AppCompatActivity
@@ -123,8 +116,42 @@ public class Mural_Activity extends AppCompatActivity
         if (Condomine_Singleton.getInstance().getTipoLogin().toString().equals("Facebook")){
             nav_edita.setEnabled(false);
         }
+        if (Condomine_Singleton.getInstance().getTipoLogin().toString().equals("Firebase")){
+            DatabaseReference mDatabase, usersRef, usuarioRef;
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+            String userID = FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
+            usersRef = mDatabase.child("users");
+            usuarioRef = usersRef.child(userID);
+            usuarioRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Usuarios usuario = dataSnapshot.getValue(Usuarios.class);
+                    Condomine_Singleton.getInstance().setNome(usuario.getNomeUsuario());
+                    Condomine_Singleton.getInstance().setFoto(usuario.getFotoURL());
+                    firebaseOpr();
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Toast.makeText(Mural_Activity.this, "Erro ao recuperar dados.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
         preparaCarregamentoMural();
+        setaAtividadeAlarmManager();
+    }
+
+    private void setaAtividadeAlarmManager() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 18 );
+        calendar.set(Calendar.MINUTE, 49);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        Intent intent = new Intent(getApplicationContext(), NotificationReceiver.class);
+        PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 100, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
     }
 
     private void verificaGoogleSignIn() {
